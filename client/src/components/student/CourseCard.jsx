@@ -29,28 +29,28 @@ const CourseCard = ({ course }) => {
         <Link
             onClick={() => window.scrollTo(0, 0)}
             to={`/course/${course?._id || ""}`}
-            className="border border-[var(--color-border)] bg-[var(--color-card)] pb-6 overflow-hidden rounded-lg transition-colors duration-300"
+            className="group overflow-hidden rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] pb-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:scale-[1.01] hover:shadow-xl"
         >
             <img
-                className="w-full"
+                className="h-52 w-full object-cover transition-transform duration-500 group-hover:scale-105"
                 src={course?.courseThumbnail || assets.placeholder}
                 alt="course"
             />
 
-            <div className="p-3 text-left">
+            <div className="p-4 text-left">
 
                 {/* Course Title */}
-                <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100">
+                <h3 className="line-clamp-2 text-base font-semibold text-gray-900 dark:text-gray-100">
                     {course?.courseTitle || "Untitled Course"}
                 </h3>
 
                 {/* Educator */}
-                <p className="text-gray-700 dark:text-gray-200">
+                <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
                     {course?.educator?.name || "Unknown Educator"}
                 </p>
 
                 {/* Rating Section */}
-                <div className="flex items-center space-x-2">
+                <div className="mt-3 flex items-center space-x-2">
                     <p>{rating}</p>
 
                     <div className="flex">
@@ -74,17 +74,17 @@ const CourseCard = ({ course }) => {
                 </div>
 
                 {/* Price */}
-                <div className="flex items-center gap-2 pt-1">
-                    <p className="text-base font-semibold text-gray-900 dark:text-gray-100">
+                <div className="flex items-center gap-2 pt-3">
+                    <p className="text-lg font-bold text-blue-600 dark:text-blue-300">
                         {formatPrice(finalPrice)}
                     </p>
-                    <p className="text-sm text-gray-700 dark:text-gray-200 line-through">
+                    <p className="text-sm text-gray-500 dark:text-gray-400 line-through">
                         {formatPrice(coursePrice)}
                     </p>
                     <button
                         type="button"
                         onClick={handleWishlist}
-                        className="ml-auto rounded-full border border-[var(--color-border)] px-3 py-1 text-xs text-gray-700 dark:text-gray-100"
+                        className="ml-auto rounded-full border border-[var(--color-border)] px-3 py-1 text-xs text-gray-700 transition-all hover:border-blue-300 hover:text-blue-600 dark:text-gray-100"
                     >
                         {wishlisted ? 'Wishlisted' : 'Wishlist'}
                     </button>

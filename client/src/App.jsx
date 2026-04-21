@@ -1,5 +1,5 @@
 import React, { useContext } from 'react'
-import { Routes, Route, useLocation, useMatch } from 'react-router-dom'
+import { Navigate, Routes, Route, useLocation, useMatch } from 'react-router-dom'
 import Navbar from './components/student/Navbar'
 import Home from './pages/student/Home'
 import CourseDetails from './pages/student/CourseDetails'
@@ -19,6 +19,36 @@ import Wishlist from './pages/student/Wishlist'
 import Chatbot from './components/student/Chatbot'
 import About from "./pages/About";
 import Contact from "./pages/Contact";
+import Login from './pages/Login';
+import Checkout from './pages/Checkout';
+import { AppContext } from './context/AppContext';
+import { useAuth, useUser } from '@clerk/clerk-react';
+
+const ProtectedRoute = ({ children, educatorOnly = false }) => {
+  const location = useLocation();
+  const { isLoaded, isSignedIn } = useAuth();
+  const { user } = useUser();
+  const { isEducator } = useContext(AppContext);
+
+  if (!isLoaded) {
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center px-6 text-center text-base font-medium text-gray-600 dark:text-gray-300">
+        {educatorOnly ? 'Loading dashboard...' : 'Loading...'}
+      </div>
+    );
+  }
+
+  if (!isSignedIn) {
+    return <Navigate to="/login" replace state={{ from: location.pathname }} />;
+  }
+
+  if (educatorOnly && !(isEducator || user?.publicMetadata?.role === 'educator')) {
+    return <Navigate to="/" replace />;
+  }
+
+  return children;
+};
+
 const App = () => {
 
   const isEducatorRoute = useMatch('/educator/*');
@@ -32,14 +62,51 @@ const App = () => {
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} /> 
         <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login />} />
         <Route path="/course/:id" element={<CourseDetails />} />
+        <Route
+          path="/checkout/:courseId"
+          element={
+            <ProtectedRoute>
+              <Checkout />
+            </ProtectedRoute>
+          }
+        />
         <Route path="/course-list" element={<CoursesList />} />
         <Route path="/course-list/:input" element={<CoursesList />} />
-        <Route path="/my-enrollments" element={<MyEnrollments />} />
-        <Route path="/wishlist" element={<Wishlist />} />
-        <Route path="/player/:courseId" element={<Player />} />
+        <Route
+          path="/my-enrollments"
+          element={
+            <ProtectedRoute>
+              <MyEnrollments />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/wishlist"
+          element={
+            <ProtectedRoute>
+              <Wishlist />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/player/:courseId"
+          element={
+            <ProtectedRoute>
+              <Player />
+            </ProtectedRoute>
+          }
+        />
         <Route path="/loading/:path" element={<Loading />} />
-        <Route path='/educator' element={<Educator />}>
+        <Route
+          path='/educator'
+          element={
+            <ProtectedRoute educatorOnly>
+              <Educator />
+            </ProtectedRoute>
+          }
+        >
           <Route path='/educator' element={<Dashboard />} />
           <Route path='add-course' element={<AddCourse />} />
           <Route path='my-courses' element={<MyCourses />} />
